@@ -10,14 +10,42 @@ import SwiftUI
 struct Menu: View {
     @Environment(\.managedObjectContext) private var viewContext
     @State var searchText = ""
-
+    @State var startersSelected = true
+    @State var mainsSelected = true
+    @State var dessertsSelected = true
+    @State var drinksSelected = true
     
     var body: some View {
         VStack {
-            Text("Little Lemon").foregroundColor(Color(red: 0.5191, green: 0.4383, blue: 0.00426)).font(.system(size:40)).padding(.horizontal, 10)
-            Text("Chicago").foregroundColor(Color.black).font(.system(size: 20)).padding(.leading, 10).padding(.bottom, 10)
-            Text("We are a family owned Mediterranean restaurant, focused on traditional recipes served with a modern twist.").padding(.leading, 10)
-            TextField("Search menu", text: $searchText).textFieldStyle(RoundedBorderTextFieldStyle()).padding(10)
+            LittleLemonLogo()
+            VStack {
+                withAnimation() {
+                    Header()
+                        .frame(maxHeight: 200)
+                    }
+                TextField("Search menu", text: $searchText)
+                    .textFieldStyle(.roundedBorder)
+                    .padding(.top, 0)
+                    .padding(.bottom)
+            }
+            .background(Color.darkGreen)
+
+            Text("ORDER FOR DELIVERY!")
+                .font(.title)
+                .fontWeight(.bold)
+                .foregroundColor(.black)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding()
+            ScrollView(.horizontal, showsIndicators: false){
+                HStack(spacing:10) {
+                    Toggle("Starters", isOn: $startersSelected).toggleStyle(.button).tint(.blue).padding(.leading, 10)
+                    Toggle("Mains", isOn: $mainsSelected).toggleStyle(.button).tint(.blue)
+                    Toggle("Drinks", isOn: $drinksSelected).toggleStyle(.button).tint(.blue)
+                    Toggle("Desserts", isOn: $dessertsSelected).toggleStyle(.button).tint(.blue)
+                }
+                .padding(.horizontal)
+            }
+            
             FetchedObjects(
                 predicate: buildPredicate(),
                 sortDescriptors: buildSortDescriptors()
@@ -43,7 +71,8 @@ struct Menu: View {
                     }
                 }
             }
-        }.onAppear{
+        }
+        .onAppear{
             getMenuData()
         }
     }
@@ -65,6 +94,7 @@ struct Menu: View {
                             dish.title = menuItem.title
                             dish.price = menuItem.price
                             dish.image = menuItem.image
+                            dish.category = menuItem.category
                         }
                         try? viewContext.save()
                     }
@@ -83,8 +113,12 @@ struct Menu: View {
     
     func buildPredicate() -> NSCompoundPredicate {
         let search = searchText.isEmpty ? NSPredicate(value: true) : NSPredicate(format: "title CONTAINS[cd] %@", searchText)
+        let starters = !startersSelected ? NSPredicate(format: "category != %@", "starters") : NSPredicate(value: true)
+        let mains = !mainsSelected ? NSPredicate(format: "category != %@", "mains") : NSPredicate(value: true)
+        let desserts = !dessertsSelected ? NSPredicate(format: "category != %@", "desserts") : NSPredicate(value: true)
+        let drinks = !drinksSelected ? NSPredicate(format: "category != %@", "drinks") : NSPredicate(value: true)
 
-        let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [search])
+        let compoundPredicate = NSCompoundPredicate(andPredicateWithSubpredicates: [search, starters, mains, desserts, drinks])
         return compoundPredicate
         }
 }
