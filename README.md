@@ -8,3 +8,4 @@ It has multiple features:
 * Search function to find a dish
 
 ## Video
+![Little Lemon App Demo](https://github.com/amstil/littlelemon/assets/6639005/fd0d22b5-7dc9-4ae4-9c38-ad61e49eacce)
