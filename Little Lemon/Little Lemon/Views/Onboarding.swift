@@ -41,6 +41,7 @@ struct Onboarding: View {
                         Text("Email *").textStyle()
                         TextField("Email", text: $email)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .autocorrectionDisabled()
                     }
                     .padding(.horizontal, 20)
                     .disableAutocorrection(true)
